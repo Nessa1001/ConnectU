@@ -1,59 +1,78 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Skills</title>
-</head>
-<body>
+<x-connectu-layout
+    :title="__('Skills')"
+    :heading="__('Skill Sharing')"
+    :subheading="__('Share what you can teach or browse skills offered by other students.')"
+>
+    <div class="grid gap-8 xl:grid-cols-[minmax(0,22rem)_1fr]">
+        <section class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
+            <flux:heading size="lg">{{ __('Share a skill') }}</flux:heading>
 
-<h1>Skill Sharing</h1>
+            <form action="{{ route('skills.store') }}" method="POST" class="mt-4 space-y-4">
+                @csrf
 
-@if(session('success'))
-    <p style="color: green;">{{ session('success') }}</p>
-@endif
+                <flux:input
+                    name="skill_name"
+                    :label="__('Skill name')"
+                    :value="old('skill_name')"
+                    required
+                    placeholder="{{ __('e.g. Python tutoring') }}"
+                />
 
-<h2>Share a Skill</h2>
+                <flux:textarea
+                    name="description"
+                    :label="__('Description')"
+                    rows="3"
+                    placeholder="{{ __('What can you help others with?') }}"
+                >{{ old('description') }}</flux:textarea>
 
-<form action="{{ route('skills.store') }}" method="POST">
-    @csrf
+                <flux:select name="skill_level" :label="__('Skill level')" required>
+                    <flux:select.option value="">{{ __('Select level') }}</flux:select.option>
+                    <flux:select.option value="Beginner" :selected="old('skill_level') === 'Beginner'">{{ __('Beginner') }}</flux:select.option>
+                    <flux:select.option value="Intermediate" :selected="old('skill_level') === 'Intermediate'">{{ __('Intermediate') }}</flux:select.option>
+                    <flux:select.option value="Advanced" :selected="old('skill_level') === 'Advanced'">{{ __('Advanced') }}</flux:select.option>
+                </flux:select>
 
-    <label>Skill Name:</label><br>
-    <input type="text" name="skill_name" value="{{ old('skill_name') }}" required><br><br>
+                <flux:input
+                    name="availability"
+                    :label="__('Availability')"
+                    :value="old('availability')"
+                    placeholder="{{ __('When are you available to help?') }}"
+                />
 
-    <label>Description:</label><br>
-    <textarea name="description" rows="3" cols="50">{{ old('description') }}</textarea><br><br>
+                <flux:button type="submit" variant="primary" class="w-full sm:w-auto">
+                    {{ __('Share skill') }}
+                </flux:button>
+            </form>
+        </section>
 
-    <label>Skill Level:</label><br>
-    <select name="skill_level" required>
-        <option value="">-- Select Level --</option>
-        <option value="Beginner">Beginner</option>
-        <option value="Intermediate">Intermediate</option>
-        <option value="Advanced">Advanced</option>
-    </select><br><br>
+        <section>
+            <flux:heading size="lg">{{ __('Available skills') }}</flux:heading>
 
-    <label>Availability:</label><br>
-    <input type="text" name="availability" value="{{ old('availability') }}"><br><br>
+            @if ($skills->isEmpty())
+                <p class="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{{ __('No skills shared yet.') }}</p>
+            @else
+                <div class="mt-4 grid gap-4">
+                    @foreach ($skills as $skill)
+                        <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <flux:heading>{{ $skill->skill_name }}</flux:heading>
+                                <flux:badge color="zinc">{{ $skill->skill_level }}</flux:badge>
+                            </div>
 
-    <button type="submit">Share Skill</button>
-</form>
+                            @if ($skill->description)
+                                <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{{ $skill->description }}</p>
+                            @endif
 
-<hr>
-
-<h2>Available Skills</h2>
-
-@if($skills->count() > 0)
-    @foreach($skills as $skill)
-        <div style="border: 1px solid #ccc; padding: 12px; margin-bottom: 12px;">
-            <h3>{{ $skill->skill_name }}</h3>
-
-            <p><strong>Description:</strong> {{ $skill->description }}</p>
-            <p><strong>Level:</strong> {{ $skill->skill_level }}</p>
-            <p><strong>Availability:</strong> {{ $skill->availability }}</p>
-            <p><strong>Shared By:</strong> {{ $skill->user->name ?? 'Unknown' }}</p>
-        </div>
-    @endforeach
-@else
-    <p>No skills shared yet.</p>
-@endif
-
-</body>
-</html>
+                            <div class="mt-3 flex flex-wrap gap-4 text-sm text-zinc-600 dark:text-zinc-400">
+                                <span>{{ __('Shared by') }}: {{ $skill->user->name ?? __('Unknown') }}</span>
+                                @if ($skill->availability)
+                                    <span>{{ __('Availability') }}: {{ $skill->availability }}</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </section>
+    </div>
+</x-connectu-layout>

@@ -1,78 +1,92 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Feedback</title>
-</head>
-<body>
+<x-connectu-layout
+    :title="__('Feedback')"
+    :heading="__('Feedback & Ratings')"
+    :subheading="__('Recognize helpful peers and review feedback you have received.')"
+>
+    <div class="grid gap-8 xl:grid-cols-[minmax(0,22rem)_1fr]">
+        <section class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
+            <flux:heading size="lg">{{ __('Give feedback') }}</flux:heading>
 
-<h1>Feedback and Ratings</h1>
+            <form action="{{ route('feedback.store') }}" method="POST" class="mt-4 space-y-4">
+                @csrf
 
-@if(session('success'))
-    <p style="color: green;">{{ session('success') }}</p>
-@endif
+                <flux:select name="receiver_id" :label="__('Student')" required>
+                    <flux:select.option value="">{{ __('Choose a user') }}</flux:select.option>
+                    @foreach ($users as $user)
+                        <flux:select.option value="{{ $user->id }}" :selected="old('receiver_id') == $user->id">
+                            {{ $user->name }} — {{ $user->email }}
+                        </flux:select.option>
+                    @endforeach
+                </flux:select>
 
-<h2>Give Feedback</h2>
+                <flux:select name="rating" :label="__('Rating')" required>
+                    <flux:select.option value="">{{ __('Select rating') }}</flux:select.option>
+                    <flux:select.option value="1" :selected="old('rating') == '1'">1 — {{ __('Poor') }}</flux:select.option>
+                    <flux:select.option value="2" :selected="old('rating') == '2'">2 — {{ __('Fair') }}</flux:select.option>
+                    <flux:select.option value="3" :selected="old('rating') == '3'">3 — {{ __('Good') }}</flux:select.option>
+                    <flux:select.option value="4" :selected="old('rating') == '4'">4 — {{ __('Very good') }}</flux:select.option>
+                    <flux:select.option value="5" :selected="old('rating') == '5'">5 — {{ __('Excellent') }}</flux:select.option>
+                </flux:select>
 
-<form action="{{ route('feedback.store') }}" method="POST">
-    @csrf
+                <flux:textarea
+                    name="comment"
+                    :label="__('Comment')"
+                    rows="4"
+                    placeholder="{{ __('Share constructive feedback (optional)') }}"
+                >{{ old('comment') }}</flux:textarea>
 
-    <label>Select User:</label><br>
-    <select name="receiver_id" required>
-        <option value="">-- Choose User --</option>
-        @foreach($users as $user)
-            <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->email }}</option>
-        @endforeach
-    </select><br><br>
+                <flux:button type="submit" variant="primary" class="w-full sm:w-auto">
+                    {{ __('Submit feedback') }}
+                </flux:button>
+            </form>
+        </section>
 
-    <label>Rating:</label><br>
-    <select name="rating" required>
-        <option value="">-- Select Rating --</option>
-        <option value="1">1 - Poor</option>
-        <option value="2">2 - Fair</option>
-        <option value="3">3 - Good</option>
-        <option value="4">4 - Very Good</option>
-        <option value="5">5 - Excellent</option>
-    </select><br><br>
+        <div class="grid gap-8">
+            <section>
+                <flux:heading size="lg">{{ __('Feedback received') }}</flux:heading>
 
-    <label>Comment:</label><br>
-    <textarea name="comment" rows="4" cols="50"></textarea><br><br>
+                @if ($feedbackReceived->isEmpty())
+                    <p class="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{{ __('No feedback received yet.') }}</p>
+                @else
+                    <div class="mt-4 grid gap-3">
+                        @foreach ($feedbackReceived as $feedback)
+                            <div class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
+                                <div class="flex items-center justify-between gap-3">
+                                    <p class="font-medium">{{ $feedback->giver->name ?? __('Unknown') }}</p>
+                                    <flux:badge color="green">{{ $feedback->rating }}/5</flux:badge>
+                                </div>
+                                @if ($feedback->comment)
+                                    <p class="mt-2 text-sm text-zinc-700 dark:text-zinc-300">{{ $feedback->comment }}</p>
+                                @endif
+                                <p class="mt-2 text-xs text-zinc-500">{{ $feedback->created_at->diffForHumans() }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </section>
 
-    <button type="submit">Submit Feedback</button>
-</form>
+            <section>
+                <flux:heading size="lg">{{ __('Feedback given') }}</flux:heading>
 
-<hr>
-
-<h2>Feedback Received</h2>
-
-@if($feedbackReceived->count() > 0)
-    @foreach($feedbackReceived as $feedback)
-        <div style="border: 1px solid #ccc; padding: 12px; margin-bottom: 12px;">
-            <p><strong>From:</strong> {{ $feedback->giver->name ?? 'Unknown' }}</p>
-            <p><strong>Rating:</strong> {{ $feedback->rating }}/5</p>
-            <p><strong>Comment:</strong> {{ $feedback->comment }}</p>
-            <small>Submitted at: {{ $feedback->created_at }}</small>
+                @if ($feedbackGiven->isEmpty())
+                    <p class="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{{ __('No feedback given yet.') }}</p>
+                @else
+                    <div class="mt-4 grid gap-3">
+                        @foreach ($feedbackGiven as $feedback)
+                            <div class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
+                                <div class="flex items-center justify-between gap-3">
+                                    <p class="font-medium">{{ __('To') }}: {{ $feedback->receiver->name ?? __('Unknown') }}</p>
+                                    <flux:badge color="zinc">{{ $feedback->rating }}/5</flux:badge>
+                                </div>
+                                @if ($feedback->comment)
+                                    <p class="mt-2 text-sm text-zinc-700 dark:text-zinc-300">{{ $feedback->comment }}</p>
+                                @endif
+                                <p class="mt-2 text-xs text-zinc-500">{{ $feedback->created_at->diffForHumans() }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </section>
         </div>
-    @endforeach
-@else
-    <p>No feedback received yet.</p>
-@endif
-
-<hr>
-
-<h2>Feedback Given</h2>
-
-@if($feedbackGiven->count() > 0)
-    @foreach($feedbackGiven as $feedback)
-        <div style="border: 1px solid #ccc; padding: 12px; margin-bottom: 12px;">
-            <p><strong>To:</strong> {{ $feedback->receiver->name ?? 'Unknown' }}</p>
-            <p><strong>Rating:</strong> {{ $feedback->rating }}/5</p>
-            <p><strong>Comment:</strong> {{ $feedback->comment }}</p>
-            <small>Submitted at: {{ $feedback->created_at }}</small>
-        </div>
-    @endforeach
-@else
-    <p>No feedback given yet.</p>
-@endif
-
-</body>
-</html>
+    </div>
+</x-connectu-layout>

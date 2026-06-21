@@ -17,18 +17,35 @@
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
+                    <flux:sidebar.item icon="user" :href="route('connectu.profile.edit')" :current="request()->routeIs('connectu.profile.*')" wire:navigate>
+                        {{ __('My Profile') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="users" :href="route('peer-matching.index')" :current="request()->routeIs('peer-matching.*')" wire:navigate>
+                        {{ __('Find Peers') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="academic-cap" :href="route('study-groups.index')" :current="request()->routeIs('study-groups.*')" wire:navigate>
+                        {{ __('Study Groups') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="chat-bubble-left-right" :href="route('messages.index')" :current="request()->routeIs('messages.*')" wire:navigate>
+                        {{ __('Messages') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="folder" :href="route('resources.index')" :current="request()->routeIs('resources.*')" wire:navigate>
+                        {{ __('Resources') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="sparkles" :href="route('skills.index')" :current="request()->routeIs('skills.*')" wire:navigate>
+                        {{ __('Skills') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="star" :href="route('feedback.index')" :current="request()->routeIs('feedback.*')" wire:navigate>
+                        {{ __('Feedback') }}
+                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 
             <flux:spacer />
 
             <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
-                </flux:sidebar.item>
-
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
+                <flux:sidebar.item icon="cog" :href="route('profile.edit')" wire:navigate>
+                    {{ __('Account Settings') }}
                 </flux:sidebar.item>
             </flux:sidebar.nav>
 

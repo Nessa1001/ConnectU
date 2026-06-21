@@ -30,6 +30,6 @@ class ProfileController extends Controller
             $validated + ['user_id' => Auth::id()]
         );
 
-        return redirect()->route('profile.edit')->with('success', 'Profile updated successfully.');
+        return redirect()->route('connectu.profile.edit')->with('success', 'Profile updated successfully.');
     }
 }

@@ -1,35 +1,56 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Create Study Group</title>
-</head>
-<body>
+<x-connectu-layout
+    :title="__('Create Study Group')"
+    :heading="__('Create Study Group')"
+    :subheading="__('Set up a new group so classmates can study together.')"
+>
+    <form action="{{ route('study-groups.store') }}" method="POST" class="max-w-2xl space-y-6">
+        @csrf
 
-<h1>Create Study Group</h1>
+        <flux:input
+            name="group_name"
+            :label="__('Group name')"
+            :value="old('group_name')"
+            required
+            placeholder="{{ __('e.g. Data Structures Study Circle') }}"
+        />
 
-<form action="{{ route('study-groups.store') }}" method="POST">
-    @csrf
+        <flux:input
+            name="course"
+            :label="__('Course')"
+            :value="old('course')"
+            required
+            placeholder="{{ __('e.g. CSC 301') }}"
+        />
 
-    <label>Group Name:</label><br>
-    <input type="text" name="group_name" value="{{ old('group_name') }}"><br><br>
+        <flux:textarea
+            name="description"
+            :label="__('Description')"
+            rows="4"
+            placeholder="{{ __('What will this group focus on?') }}"
+        >{{ old('description') }}</flux:textarea>
 
-    <label>Course:</label><br>
-    <input type="text" name="course" value="{{ old('course') }}"><br><br>
+        <flux:input
+            name="max_members"
+            type="number"
+            min="2"
+            max="100"
+            :label="__('Maximum members')"
+            :value="old('max_members', 10)"
+            required
+        />
 
-    <label>Description:</label><br>
-    <textarea name="description">{{ old('description') }}</textarea><br><br>
+        <flux:input
+            name="meeting_schedule"
+            :label="__('Meeting schedule')"
+            :value="old('meeting_schedule')"
+            placeholder="{{ __('e.g. Tuesdays & Thursdays, 6–8 PM') }}"
+        />
 
-    <label>Max Members:</label><br>
-    <input type="number" name="max_members" value="{{ old('max_members', 10) }}"><br><br>
-
-    <label>Meeting Schedule:</label><br>
-    <input type="text" name="meeting_schedule" value="{{ old('meeting_schedule') }}"><br><br>
-
-    <button type="submit">Create Group</button>
-</form>
-
-<br>
-<a href="{{ route('study-groups.index') }}">Back to Study Groups</a>
-
-</body>
-</html>
+        <div class="flex items-center gap-3">
+            <flux:button type="submit" variant="primary">{{ __('Create group') }}</flux:button>
+            <flux:button :href="route('study-groups.index')" variant="ghost" wire:navigate>
+                {{ __('Cancel') }}
+            </flux:button>
+        </div>
+    </form>
+</x-connectu-layout>

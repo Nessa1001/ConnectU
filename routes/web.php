@@ -23,8 +23,8 @@ Route::prefix('{current_team}')
 
 Route::middleware(['auth'])->group(function () {
     Route::livewire('invitations/{invitation}/accept', 'pages::teams.accept-invitation')->name('invitations.accept');
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('connectu.profile.edit');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('connectu.profile.update');
     Route::get('/study-groups', [StudyGroupController::class, 'index'])->name('study-groups.index');
     Route::get('/study-groups/create', [StudyGroupController::class, 'create'])->name('study-groups.create');
     Route::post('/study-groups', [StudyGroupController::class, 'store'])->name('study-groups.store');

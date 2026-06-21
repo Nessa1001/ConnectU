@@ -1,40 +1,52 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Profile</title>
-</head>
-<body>
+<x-connectu-layout
+    :title="__('My Profile')"
+    :heading="__('Academic Profile')"
+    :subheading="__('Tell other students about your course, interests, and availability for better peer matching.')"
+>
+    <form action="{{ route('connectu.profile.update') }}" method="POST" class="max-w-2xl space-y-6">
+        @csrf
 
-<h1>Edit Profile</h1>
+        <flux:input
+            name="course"
+            :label="__('Course / Programme')"
+            :value="old('course', $profile->course ?? '')"
+            required
+            placeholder="{{ __('e.g. BSc Computer Science') }}"
+        />
 
-@if(session('success'))
-    <p style="color: green;">
-        {{ session('success') }}
-    </p>
-@endif
+        <flux:textarea
+            name="bio"
+            :label="__('Bio')"
+            rows="4"
+            placeholder="{{ __('A short introduction about yourself') }}"
+        >{{ old('bio', $profile->bio ?? '') }}</flux:textarea>
 
-<form action="{{ route('profile.update') }}" method="POST">
-    @csrf
+        <flux:textarea
+            name="interests"
+            :label="__('Interests')"
+            rows="3"
+            placeholder="{{ __('Comma-separated, e.g. algorithms, web development, research') }}"
+        >{{ old('interests', $profile->interests ?? '') }}</flux:textarea>
 
-    <label>Course:</label><br>
-    <input type="text" name="course"
-        value="{{ old('course', $profile->course ?? '') }}"><br><br>
+        <flux:textarea
+            name="skills"
+            :label="__('Skills')"
+            rows="3"
+            placeholder="{{ __('Comma-separated, e.g. Python, public speaking, calculus') }}"
+        >{{ old('skills', $profile->skills ?? '') }}</flux:textarea>
 
-    <label>Bio:</label><br>
-    <textarea name="bio">{{ old('bio', $profile->bio ?? '') }}</textarea><br><br>
+        <flux:input
+            name="availability"
+            :label="__('Availability')"
+            :value="old('availability', $profile->availability ?? '')"
+            placeholder="{{ __('e.g. Weekday evenings, Saturday mornings') }}"
+        />
 
-    <label>Interests:</label><br>
-    <textarea name="interests">{{ old('interests', $profile->interests ?? '') }}</textarea><br><br>
-
-    <label>Skills:</label><br>
-    <textarea name="skills">{{ old('skills', $profile->skills ?? '') }}</textarea><br><br>
-
-    <label>Availability:</label><br>
-    <input type="text" name="availability"
-        value="{{ old('availability', $profile->availability ?? '') }}"><br><br>
-
-    <button type="submit">Save Profile</button>
-</form>
-
-</body>
-</html>
+        <div class="flex items-center gap-3">
+            <flux:button type="submit" variant="primary">{{ __('Save profile') }}</flux:button>
+            <flux:button :href="route('peer-matching.index')" variant="ghost" wire:navigate>
+                {{ __('Find peers') }}
+            </flux:button>
+        </div>
+    </form>
+</x-connectu-layout>

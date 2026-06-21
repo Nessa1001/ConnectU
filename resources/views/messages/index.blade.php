@@ -1,70 +1,78 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Messages</title>
-</head>
-<body>
+<x-connectu-layout
+    :title="__('Messages')"
+    :heading="__('Messages')"
+    :subheading="__('Send messages and review your conversations with other students.')"
+>
+    <div class="grid gap-8 xl:grid-cols-[minmax(0,22rem)_1fr]">
+        <section class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
+            <flux:heading size="lg">{{ __('Send a message') }}</flux:heading>
 
-<h1>Messages</h1>
+            <form action="{{ route('messages.store') }}" method="POST" class="mt-4 space-y-4">
+                @csrf
 
-@if(session('success'))
-    <p style="color: green;">{{ session('success') }}</p>
-@endif
+                <flux:select name="receiver_id" :label="__('Recipient')" required>
+                    <flux:select.option value="">{{ __('Choose a user') }}</flux:select.option>
+                    @foreach ($users as $user)
+                        <flux:select.option value="{{ $user->id }}" :selected="old('receiver_id') == $user->id">
+                            {{ $user->name }} — {{ $user->email }}
+                        </flux:select.option>
+                    @endforeach
+                </flux:select>
 
-<h2>Send Message</h2>
+                <flux:textarea
+                    name="message"
+                    :label="__('Message')"
+                    rows="5"
+                    required
+                    placeholder="{{ __('Write your message here...') }}"
+                >{{ old('message') }}</flux:textarea>
 
-<form action="{{ route('messages.store') }}" method="POST">
-    @csrf
+                <flux:button type="submit" variant="primary" class="w-full sm:w-auto">
+                    {{ __('Send message') }}
+                </flux:button>
+            </form>
+        </section>
 
-    <label>Select User:</label><br>
-    <select name="receiver_id" required>
-        <option value="">-- Choose User --</option>
-        @foreach($users as $user)
-            <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->email }}</option>
-        @endforeach
-    </select>
+        <div class="grid gap-8">
+            <section>
+                <flux:heading size="lg">{{ __('Received') }}</flux:heading>
 
-    <br><br>
+                @if ($receivedMessages->isEmpty())
+                    <p class="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{{ __('No received messages yet.') }}</p>
+                @else
+                    <div class="mt-4 grid gap-3">
+                        @foreach ($receivedMessages as $message)
+                            <div class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
+                                <div class="flex items-center justify-between gap-3">
+                                    <p class="font-medium">{{ $message->sender->name ?? __('Unknown') }}</p>
+                                    <span class="text-xs text-zinc-500">{{ $message->created_at->diffForHumans() }}</span>
+                                </div>
+                                <p class="mt-2 text-sm text-zinc-700 dark:text-zinc-300">{{ $message->message }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </section>
 
-    <label>Message:</label><br>
-    <textarea name="message" rows="4" cols="50" required></textarea>
+            <section>
+                <flux:heading size="lg">{{ __('Sent') }}</flux:heading>
 
-    <br><br>
-
-    <button type="submit">Send Message</button>
-</form>
-
-<hr>
-
-<h2>Received Messages</h2>
-
-@if($receivedMessages->count() > 0)
-    @foreach($receivedMessages as $message)
-        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
-            <p><strong>From:</strong> {{ $message->sender->name ?? 'Unknown' }}</p>
-            <p>{{ $message->message }}</p>
-            <small>Sent at: {{ $message->created_at }}</small>
+                @if ($sentMessages->isEmpty())
+                    <p class="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{{ __('No sent messages yet.') }}</p>
+                @else
+                    <div class="mt-4 grid gap-3">
+                        @foreach ($sentMessages as $message)
+                            <div class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
+                                <div class="flex items-center justify-between gap-3">
+                                    <p class="font-medium">{{ __('To') }}: {{ $message->receiver->name ?? __('Unknown') }}</p>
+                                    <span class="text-xs text-zinc-500">{{ $message->created_at->diffForHumans() }}</span>
+                                </div>
+                                <p class="mt-2 text-sm text-zinc-700 dark:text-zinc-300">{{ $message->message }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </section>
         </div>
-    @endforeach
-@else
-    <p>No received messages yet.</p>
-@endif
-
-<hr>
-
-<h2>Sent Messages</h2>
-
-@if($sentMessages->count() > 0)
-    @foreach($sentMessages as $message)
-        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
-            <p><strong>To:</strong> {{ $message->receiver->name ?? 'Unknown' }}</p>
-            <p>{{ $message->message }}</p>
-            <small>Sent at: {{ $message->created_at }}</small>
-        </div>
-    @endforeach
-@else
-    <p>No sent messages yet.</p>
-@endif
-
-</body>
-</html>
+    </div>
+</x-connectu-layout>

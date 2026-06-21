@@ -12,7 +12,7 @@ class PeerMatchingController extends Controller
         $myProfile = Auth::user()->profile;
 
         if (!$myProfile) {
-            return redirect()->route('profile.edit')
+            return redirect()->route('connectu.profile.edit')
                 ->with('success', 'Please complete your profile before finding peers.');
         }
 
